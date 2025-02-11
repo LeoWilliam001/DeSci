@@ -25,6 +25,15 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
+app.get("/api/data", async (req, res) => {
+  try {
+    const data = await Pdf.find({});
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch data" });
+  }
+});
 // Configure Multer for file storage
 const storage = multer.memoryStorage(); // Use memory storage to get the file buffer directly
 const upload = multer({ storage });
@@ -95,10 +104,9 @@ app.post("/api/upload", upload.single("pdf"), async (req, res) => {
       return res.status(400).json({ message: "Duplicate PDF detected!", similarTo: duplicateDoc });
     }
 
-    // Save new PDF
     const newPdf = new Pdf({
       filename: req.file.originalname,
-      fileUrl: `/uploads/${req.file.filename}`, // Store file path
+      fileUrl: `/uploads/${req.file.filename}`, 
       textContent: textContent,
       embeddings: embeddings,
     });
