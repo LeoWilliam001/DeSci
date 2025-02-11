@@ -12,12 +12,18 @@ dotenv.config(); // Load environment variables from .env file
 const app = express();
 const port = 5000;
 
+// Configure CORS to allow requests from your frontend domain
+const corsOptions = {
+  origin: "http://localhost:3000", // Replace with your frontend URL
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Failed to connect to MongoDB", err));
-
-app.use(cors());
-app.use(express.json());
 
 // Configure Multer for file storage
 const storage = multer.memoryStorage(); // Use memory storage to get the file buffer directly
