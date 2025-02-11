@@ -10,24 +10,20 @@ import axios from "axios";
 dotenv.config(); // Load environment variables from .env file
 
 const app = express();
-const port = process.env.PORT || 5000;
-
-// Configure CORS to allow requests from your frontend domain
-// const corsOptions = {
-//   origin: "http://localhost:3000", // Replace with your frontend URL
-//   optionsSuccessStatus: 200,
-// };
-
-// app.use(cors(corsOptions));
-
-app.use(cors({
-  origin: "http://localhost:3000",
-}))
-app.use(express.json());
+const port = process.env.PORT || 5000; // Use environment variable for port or default to 5000
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Failed to connect to MongoDB", err));
+
+// Configure CORS to allow requests from your frontend domain
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || "http://localhost:3000", // Replace with your frontend URL
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
 
 // Configure Multer for file storage
 const storage = multer.memoryStorage(); // Use memory storage to get the file buffer directly
@@ -116,7 +112,7 @@ app.post("/api/upload", upload.single("pdf"), async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Backend running on http://localhost:${port}`);
+  console.log(`Backend running on port ${port}`);
 });
 
 export default app;
