@@ -10,15 +10,19 @@ import axios from "axios";
 dotenv.config(); // Load environment variables from .env file
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 // Configure CORS to allow requests from your frontend domain
-const corsOptions = {
-  origin: "http://localhost:3000", // Replace with your frontend URL
-  optionsSuccessStatus: 200,
-};
+// const corsOptions = {
+//   origin: "http://localhost:3000", // Replace with your frontend URL
+//   optionsSuccessStatus: 200,
+// };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+
+app.use(cors({
+  origin: "http://localhost:3000",
+}))
 app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URI)
