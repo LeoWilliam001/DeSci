@@ -17,8 +17,19 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((err) => console.error("Failed to connect to MongoDB", err));
 
 // Configure CORS to allow requests from your frontend domain
+const allowedOrigins = [
+  process.env.FRONTEND_URL, // Local development URL
+  `http://${require('os').networkInterfaces().eth0[0].address}:3000` // Network URL for local development
+];
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "http://localhost:3000", // Replace with your frontend URL
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   optionsSuccessStatus: 200,
 };
 
