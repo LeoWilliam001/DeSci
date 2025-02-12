@@ -28,7 +28,7 @@ app.use(express.json());
 
 app.get("/api/data", async (req, res) => {
   try {
-    const data = await Pdf.find({});
+    const data = await Pdf.find({}).select('_id filename contractAddress textContent uploadedAt');
     res.json(data);
   } catch (err) {
     console.error(err);
@@ -39,7 +39,7 @@ const contractAddress = "0x741be4559561ebFB37fa2d5277AB548BFb8a2C3f";
 app.get("/api/data/contract/:contractAddress", async (req, res) => {
   try {
     // const data = await Pdf.find({ contractAdd: localStorage.getItem('contractAdd') });
-    const data = await Pdf.find({ contractAdd: contractAddress });    
+    const data = await Pdf.find({ contractAdd: contractAddress }).select('_id filename contractAddress');    
     res.json(data);
   } catch (err) {
     console.error(err);
