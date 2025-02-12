@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const PdfSchema = new mongoose.Schema({
   filename: String,
+  contractAdd: String,
   fileUrl: String,
   textContent: String,
   embeddings: { type: [Number], index: "vector" }, // Ensures embeddings are indexed

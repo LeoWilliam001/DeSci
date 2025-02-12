@@ -11,6 +11,7 @@ dotenv.config(); // Load environment variables from .env file
 
 const app = express();
 const port = process.env.PORT || 5000; // Use environment variable for port or default to 5000
+// localStorage.setItem('contractAdd', "0x741be4559561ebFB37fa2d5277AB548BFb8a2C3f");
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
@@ -34,6 +35,17 @@ app.get("/api/data", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch data" });
   }
 });
+const contractAddress = "0x741be4559561ebFB37fa2d5277AB548BFb8a2C3f";
+app.get("/api/data/contract/:contractAddress", async (req, res) => {
+  try {
+    // const data = await Pdf.find({ contractAdd: localStorage.getItem('contractAdd') });
+    const data = await Pdf.find({ contractAdd: contractAddress });    
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch data" });
+  }
+});
 // Configure Multer for file storage
 const storage = multer.memoryStorage(); // Use memory storage to get the file buffer directly
 const upload = multer({ storage });
@@ -45,7 +57,7 @@ app.post("/api/upload", upload.single("pdf"), async (req, res) => {
     console.log("PDF Buffer:", pdfBuffer);
 
     const pdfData = await pdfParse(pdfBuffer);
-    console.log("PDF Data:", pdfData);
+    // console.log("PDF Data:", pdfData);
 
     // Extract text content from pageData
     let textContent = pdfData.pageData.join(" ").trim();
@@ -72,7 +84,7 @@ app.post("/api/upload", upload.single("pdf"), async (req, res) => {
     );
 
     const embeddings = response.data.data[0].embedding;
-    console.log("Embeddings:", embeddings);
+    // console.log("Embeddings:", embeddings);
 
     // Perform a vector search to find similar documents
     const similarDocs = await Pdf.aggregate([
@@ -97,15 +109,17 @@ app.post("/api/upload", upload.single("pdf"), async (req, res) => {
     console.log("Similar Docs:", similarDocs);
 
     // Check if any similar document has a similarity score above 0.85
-    const duplicateDoc = similarDocs.find(doc => doc.similarity > 0.85);
+    const duplicateDoc = similarDocs.find(doc => doc.similarity > 0.95);
 
     if (duplicateDoc) {
       console.log("Duplicate PDF detected:", duplicateDoc);
       return res.status(400).json({ message: "Duplicate PDF detected!", similarTo: duplicateDoc });
     }
-
+    // localStorage.setItem('contractAdd', req.body.contractAdd);
+    // console.log("Contract Address:", localStorage.getItem('contractAdd'));
     const newPdf = new Pdf({
       filename: req.file.originalname,
+      contractAdd: contractAddress,
       fileUrl: `/uploads/${req.file.filename}`, 
       textContent: textContent,
       embeddings: embeddings,
