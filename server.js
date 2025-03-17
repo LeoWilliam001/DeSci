@@ -14,7 +14,7 @@ dotenv.config(); // Load environment variables from .env file
 
 const app = express();
 const port = process.env.PORT || 5000; // Use environment variable for port or default to 5000
-
+app.use(cors());
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
