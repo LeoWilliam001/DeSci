@@ -10,6 +10,7 @@ import axios from "axios";
 
 
 dotenv.config(); // Load environment variables from .env file
+app.use(cors()); // Allow all origins (not secure)
 
 
 const app = express();
